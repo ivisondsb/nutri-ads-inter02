@@ -1,35 +1,57 @@
 package br.com.ivisondsb.nutri_inter.controllers
 
-import br.com.ivisondsb.nutri_inter.models.Pessoa
+import br.com.ivisondsb.nutri_inter.dto.CreatePessoaDTO
+import br.com.ivisondsb.nutri_inter.dto.PessoaDTO
 import br.com.ivisondsb.nutri_inter.services.PessoaService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("/pessoas")
 class PessoaController(private val pessoaService: PessoaService) {
 
     @GetMapping
-    fun getAll(): List<Pessoa> = pessoaService.findAll()
-
-    @GetMapping("/{id}")
-    fun getPessoaById(@PathVariable id: Long): ResponseEntity<Pessoa> {
-        val pessoa = pessoaService.findById(id)
-        return if (pessoa != null) ResponseEntity.ok(pessoa) else ResponseEntity.notFound().build()
+    fun getAll(): ResponseEntity<List<PessoaDTO>> {
+        val pessoas = pessoaService.findAll()
+        val pessoasDTO = pessoas.map { pessoaService.toDTO(it) }
+        return ResponseEntity.ok(pessoasDTO)
     }
 
     @PostMapping
-    fun createPessoa(@RequestBody pessoa: Pessoa): Pessoa = pessoaService.save(pessoa)
+    fun createPessoa(@RequestBody pessoaDTO: CreatePessoaDTO): ResponseEntity<PessoaDTO> {
+        val pessoa = pessoaService.fromDTO(pessoaDTO)
+        val savedPessoa = pessoaService.save(pessoa)
+        return ResponseEntity.ok(pessoaService.toDTO(savedPessoa))
+    }
+
+    @GetMapping("/{id}")
+    fun getPessoaById(@PathVariable id: Long): ResponseEntity<PessoaDTO> {
+        val pessoa = pessoaService.findById(id) ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok(pessoaService.toDTO(pessoa))
+    }
 
     @PutMapping("/{id}")
-    fun updatePessoa(@PathVariable id: Long, @RequestBody pessoa: Pessoa): ResponseEntity<Pessoa> {
-        val pessoaExistente = pessoaService.findById(id)
-        return if (pessoaExistente != null) {
-            val pessoaAtualizada = pessoaService.save(pessoa.copy(id = id))
-            ResponseEntity.ok(pessoaAtualizada)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+    fun updatePessoa(@PathVariable id: Long, @RequestBody pessoaDTO: CreatePessoaDTO): ResponseEntity<PessoaDTO> {
+        val pessoaExistente = pessoaService.findById(id) ?: return ResponseEntity.notFound().build()
+        val updatedPessoa = pessoaExistente.copy(
+            nome = pessoaDTO.nome,
+            sexo = pessoaDTO.sexo,
+            cpf = pessoaDTO.cpf,
+            email = pessoaDTO.email,
+            telefone = pessoaDTO.telefone,
+            dataDeNascimento = LocalDate.parse(pessoaDTO.dataDeNascimento),
+            idade = pessoaDTO.idade,
+            cep = pessoaDTO.cep,
+            endereco = pessoaDTO.endereco,
+            numeroDaCasa = pessoaDTO.numeroDaCasa,
+            complemento = pessoaDTO.complemento,
+            bairro = pessoaDTO.bairro,
+            cidade = pessoaDTO.cidade,
+            estado = pessoaDTO.estado
+        )
+        pessoaService.save(updatedPessoa)
+        return ResponseEntity.ok(pessoaService.toDTO(updatedPessoa))
     }
 
     @DeleteMapping("/{id}")

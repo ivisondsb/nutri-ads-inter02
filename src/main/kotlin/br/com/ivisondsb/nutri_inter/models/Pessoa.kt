@@ -11,31 +11,31 @@ data class Pessoa(
     @Column(name = "id")
     val id: Long = 0,
     @Column(name = "nome")
-    val nome: String,
+    val nome: String = "",
     @Column(name = "sexo")
-    val sexo: Char,
+    val sexo: Char = ' ',
     @Column(name = "cpf")
-    val cpf: String,
+    val cpf: String = "",
     @Column(name = "data_nascimento")
-    val dataDeNascimento: LocalDate,
+    val dataDeNascimento: LocalDate = LocalDate.now(),
     @Column(name = "idade")
     val idade: Int = LocalDate.now().year - dataDeNascimento.year,
     @Column(name = "telefone")
-    val telefone: String,
+    val telefone: String = "",
     @Column(name = "email")
-    val email: String,
+    val email: String = "",
     @Column(name = "cep")
-    val cep: String,
+    val cep: String = "",
     @Column(name = "endereco")
-    val endereco: String,
+    val endereco: String = "",
     @Column(name = "complemento")
-    val complemento: String,
+    val complemento: String = "",
     @Column(name = "numero_casa")
-    val numeroDaCasa: Int,
+    val numeroDaCasa: Int = 0,
     @Column(name = "bairro")
-    val bairro: String,
+    val bairro: String = "",
     @Column(name = "cidade")
-    val cidade: String,
+    val cidade: String = "",
     @Column(name = "estado")
-    val estado: String
+    val estado: String = ""
 )
